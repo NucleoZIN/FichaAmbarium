@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ficha de RPG Digital</title>
+
+<style>
+/* ================= VARIÁVEIS ================= */
+:root {
+    --bg: #121212;
+    --card: #1f1f1f;
+    --card-light: #2a2a2a;
+    --text: #ffffff;
+    --muted: #aaaaaa;
+
+    --vida: #e74c3c;
+    --sanidade: #9b59b6;
+    --mp: #3498db;
+    --mov: #2ecc71;
+    --accent: #f1c40f;
+}
+
+/* ================= BASE ================= */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 30px;
+    background: linear-gradient(135deg, #0f0f0f, #1b1b1b);
+    font-family: 'Segoe UI', sans-serif;
+    color: var(--text);
+    display: flex;
+    justify-content: center;
+}
+
+/* ================= CONTAINER ================= */
+.ficha-container {
+    width: 100%;
+    max-width: 520px;
+    background: var(--card);
+    border-radius: 18px;
+    padding: 25px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+}
+
+h2 {
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+}
+
+/* ================= FOTO ================= */
+.foto-container {
+    width: 160px;
+    height: 160px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    border: 2px dashed #555;
+    background: #191919;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    overflow: hidden;
+    transition: 0.3s;
+}
+
+.foto-container:hover {
+    border-color: var(--accent);
+}
+
+.foto-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: none;
+}
+
+.foto-container span {
+    font-size: 0.8em;
+    color: var(--muted);
+    text-align: center;
+    padding: 10px;
+}
+
+#input-foto {
+    display: none;
+}
+
+/* ================= INFORMAÇÕES ================= */
+.info-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 25px;
+    background: var(--card-light);
+    padding: 15px;
+    border-radius: 12px;
+}
+
+.info-box {
+    display: flex;
+    flex-direction: column;
+}
+
+.info-box.full {
+    grid-column: span 2;
+}
+
+.info-box label {
+    font-size: 0.65em;
+    text-transform: uppercase;
+    font-weight: bold;
+    color: var(--accent);
+    margin-bottom: 4px;
+}
+
+.info-box input {
+    background: #141414;
+    border: 1px solid #444;
+    border-radius: 6px;
+    padding: 8px;
+    color: white;
+}
+
+/* ================= STATUS ================= */
+.status-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.status-box {
+    background: var(--card-light);
+    padding: 15px;
+    border-radius: 12px;
+    text-align: center;
+    border-left: 5px solid;
+}
+
+.status-box label {
+    font-size: 0.75em;
+    color: var(--muted);
+}
+
+.status-box .attr-valor {
+    font-size: 1.6em;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.vida { border-color: var(--vida); }
+.sanidade { border-color: var(--sanidade); }
+.mp { border-color: var(--mp); }
+.mov { border-color: var(--mov); }
+
+/* ================= CONTROLES ================= */
+.controles {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+button {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2em;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+button:hover {
+    transform: scale(1.1);
+    opacity: 0.85;
+}
+
+.btn-add { background: #27ae60; color: white; }
+.btn-sub { background: #c0392b; color: white; }
+
+/* ================= INICIATIVA ================= */
+.iniciativa-section {
+    background: #333;
+    padding: 12px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+/* ================= ATRIBUTOS ================= */
+.atributos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+    gap: 12px;
+}
+
+.attr-card {
+    background: #161616;
+    border: 1px solid #444;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+}
+
+.attr-name {
+    font-size: 0.7em;
+    color: var(--muted);
+    font-weight: bold;
+}
+
+.attr-valor {
+    font-size: 1.4em;
+    margin: 6px 0;
+}
+
+/* ================= RESET ================= */
+.btn-reset {
+    margin-top: 30px;
+    width: 100%;
+    height: 42px;
+    background: #555;
+    border-radius: 10px;
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="ficha-container">
+    <h2>Ficha de Personagem</h2>
+
+    <div class="foto-container" onclick="inputFoto.click()">
+        <span id="labelFoto">Adicionar Foto</span>
+        <img id="previewFoto">
+    </div>
+    <input type="file" id="inputFoto" accept="image/*">
+
+    <div class="info-section">
+        <div class="info-box full">
+            <label>Nome</label>
+            <input id="info-nome">
+        </div>
+        <div class="info-box">
+            <label>Raça</label>
+            <input id="info-raca">
+        </div>
+        <div class="info-box">
+            <label>Idade</label>
+            <input id="info-idade">
+        </div>
+        <div class="info-box">
+            <label>Tamanho</label>
+            <input id="info-tamanho">
+        </div>
+        <div class="info-box">
+            <label>Condição</label>
+            <input id="info-condicao">
+        </div>
+    </div>
+
+    <div class="status-grid">
+        <div class="status-box vida">
+            <label>VIDA</label>
+            <div class="attr-valor" id="val-vida">20</div>
+            <div class="controles">
+                <button class="btn-sub" onclick="alterar('vida',-1)">-</button>
+                <button class="btn-add" onclick="alterar('vida',1)">+</button>
+            </div>
+        </div>
+
+        <div class="status-box sanidade">
+            <label>SANIDADE</label>
+            <div class="attr-valor" id="val-sanidade">20</div>
+            <div class="controles">
+                <button class="btn-sub" onclick="alterar('sanidade',-1)">-</button>
+                <button class="btn-add" onclick="alterar('sanidade',1)">+</button>
+            </div>
+        </div>
+
+        <div class="status-box mp">
+            <label>MP</label>
+            <div class="attr-valor" id="val-mp">15</div>
+            <div class="controles">
+                <button class="btn-sub" onclick="alterar('mp',-1)">-</button>
+                <button class="btn-add" onclick="alterar('mp',1)">+</button>
+            </div>
+        </div>
+
+        <div class="status-box mov">
+            <label>MOV</label>
+            <div class="attr-valor" id="val-mov">8</div>
+            <div class="controles">
+                <button class="btn-sub" onclick="alterar('mov',-1)">-</button>
+                <button class="btn-add" onclick="alterar('mov',1)">+</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="iniciativa-section">
+        <strong>INICIATIVA</strong>
+        <div class="controles">
+            <button class="btn-sub" onclick="alterar('iniciativa',-1)">-</button>
+            <span class="attr-valor" id="val-iniciativa">10</span>
+            <button class="btn-add" onclick="alterar('iniciativa',1)">+</button>
+        </div>
+    </div>
+
+    <div class="atributos-grid"></div>
+
+    <button class="btn-reset" onclick="resetar()">Resetar Ficha</button>
+</div>
+
+<script>
+const atributos = { FOR:0, INT:0, CON:0, DES:0, PER:0, CAR:0, SOR:0 };
+const status = { vida:20, sanidade:20, mp:15, mov:8, iniciativa:10 };
+const grid = document.querySelector('.atributos-grid');
+
+function renderAtributos(){
+    grid.innerHTML = '';
+    for(let a in atributos){
+        grid.innerHTML += `
+        <div class="attr-card">
+            <div class="attr-name">${a}</div>
+            <div class="attr-valor" id="val-${a}">${atributos[a]}</div>
+            <div class="controles">
+                <button class="btn-sub" onclick="alterar('${a}',-1,true)">-</button>
+                <button class="btn-add" onclick="alterar('${a}',1,true)">+</button>
+            </div>
+        </div>`;
+    }
+}
+
+function alterar(campo,valor,isAttr=false){
+    if(isAttr){
+        atributos[campo]+=valor;
+        document.getElementById(`val-${campo}`).innerText=atributos[campo];
+    }else{
+        status[campo]+=valor;
+        document.getElementById(`val-${campo}`).innerText=status[campo];
+    }
+    salvar();
+}
+
+function salvar(){
+    localStorage.setItem('fichaRPG',JSON.stringify({atributos,status}));
+}
+
+function resetar(){
+    if(confirm("Deseja resetar a ficha?")){
+        localStorage.removeItem('fichaRPG');
+        location.reload();
+    }
+}
+
+renderAtributos();
+</script>
+
+</body>
+</html>
